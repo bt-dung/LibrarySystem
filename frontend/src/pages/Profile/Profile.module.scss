@@ -1,0 +1,48 @@
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
+    .title {
+      font-size: 2rem;
+      padding-top: 70px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+  
+    .cover {
+      height: 400px;
+      width: 300px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;
+    }
+  
+    .author, .publish-year, .isbn, .genre {
+      font-size: 1rem;
+      color: #555;
+      margin: 5px 0;
+    }
+  
+    .author {
+      font-weight: 600;
+    }
+  
+    .publish-year {
+      color: #777;
+    }
+  
+    .isbn {
+      font-style: italic;
+    }
+  
+    .subcategory {
+      font-weight: 500;
+    }
+  }
+  
