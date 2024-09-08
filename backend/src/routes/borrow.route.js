@@ -1,8 +1,8 @@
 const express = require('express');
-const insertBorrow = require('../controller/borrow');
+const { borrow } = require('../controller/borrow');
 const router = express.Router();
 
-router.post('/insertBorrow', insertBorrow);
+router.post('/borrow', borrow);
 
-module.exports = router
+module.exports = router;
 

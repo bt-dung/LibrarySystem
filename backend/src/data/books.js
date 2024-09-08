@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path')
 const filePath = path.join(__dirname, "../public/books.json")
-const Books = require('../models/Books');
+const Book = require('../models/Books');
 const saveBooks = async () => {
     try {
         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -10,7 +10,7 @@ const saveBooks = async () => {
         for (let i in listData) {
             console.log(listData[i]);
 
-            const dataBook = await Books.create(listData[i]);
+            const dataBook = await Book.create(listData[i]);
         }
         console.log('Books have been succcessfully!!!!')
     } catch (error) {

@@ -16,7 +16,10 @@ function Home() {
   useEffect(() => {
     fetch('http://localhost:5000/book/allBook')
       .then(response => response.json())
-      .then(data => setBooks(data.data || []))
+      .then(data => {
+        console.log(data);
+        return setBooks(data || [])
+      })
       .catch(error => console.error('Error fetching books:', error));
   }, []);
 
@@ -25,7 +28,6 @@ function Home() {
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
   const totalPages = Math.ceil(books.length / BOOKS_PER_PAGE);
 
-  // Hàm xử lý nút Đăng ký
   const handleRegister = (bookId) => {
     fetch(`http://localhost:5000/book/${bookId}`, {
       method: 'PATCH',
@@ -57,30 +59,41 @@ function Home() {
       <h2>Thư Viện Trường Đại Hoc Thăng Long</h2>
       <div className={cx('book-list')}>
         {currentBooks.length > 0 ? (
-          currentBooks.map((book) => (
-            <div className={cx('book-item')} key={book.id}>
-              {book.id ? (
-                <Link to={`/book/${book.id}`} className={cx('book-wrapper')}>
-                  <img
-                    className={cx('book-cover')}
-                    src={book.cover_url}
-                    alt={book.title}
-                  />
+          currentBooks.map((book) => {
+            console.log(book.cover_url)
+            return (
+              <div className={cx('book-item')} key={book.id}>
+                {book ? (
+                  <div>
+                    <img
+                      style={{ width: 100, height: 100 }}
+                      className={cx('book-cover')}
+                      src={book.cover_url}
+                      alt={book.title}
+                    />
+                    <Link to={`/book/${book.id}`} className={cx('book-wrapper')}>
+                      <img
+                        style={{ width: 100, height: 100 }}
+                        className={cx('book-cover')}
+                        src={book.cover_url}
+                        alt={book.title}
+                      />
+                      <div className={cx('book-info')}>
+                        <p className={cx('book-title')}>{book.title}</p>
+                      </div>
+                    </Link></div>
+                ) : (
                   <div className={cx('book-info')}>
                     <p className={cx('book-title')}>{book.title}</p>
+                    <p className={cx('error-text')}>No namebook available</p>
                   </div>
-                </Link>
-              ) : (
-                <div className={cx('book-info')}>
-                  <p className={cx('book-title')}>{book.title}</p>
-                  <p className={cx('error-text')}>No namebook available</p>
+                )}
+                <div className={cx('button-book')}>
+                  <Button outline onClick={() => handleRegister(book.id)}>Đăng ký</Button>
                 </div>
-              )}
-              <div className={cx('button-book')}>
-                <Button outline onClick={() => handleRegister(book.id)}>Đăng ký</Button>
               </div>
-            </div>
-          ))
+            )
+          })
         ) : (
           <p>No books.</p>
         )}

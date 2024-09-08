@@ -1,4 +1,4 @@
-const Users = require('../models/User')
+const User = require('../models/User')
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { asyncHandler } = require('../middlewares/asyncHandler')
@@ -6,17 +6,16 @@ const { asyncHandler } = require('../middlewares/asyncHandler')
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, msv, email, password } = req.body;
-
     if (!username || !msv || !email || !password) {
         throw new Error("Please fill all the inputs.");
     }
 
-    const userExists = await Users.findOne({ msv });
+    const userExists = await User.findOne({ msv });
     if (userExists) { return res.status(400).send({ message: "User already exists", success: false }) };
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new Users({ username, msv, email, password: hashedPassword });
+    const newUser = new User({ studentName: username, msv: msv, email: email, password: hashedPassword });
 
     try {
         await newUser.save();

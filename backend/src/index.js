@@ -10,7 +10,11 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3000",
+    methods: ["POST,GET,PUT,DELETE"],
+    credentials: true,
+}));
 dotenv.config();
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
@@ -24,7 +28,7 @@ app.use(express.static("public"))
 // saveBooks();
 app.use("/book", bookRoute);
 app.use("/auth", authRoute);
-app.use('/borrow', borrowRoute);
+app.use('/api', borrowRoute);
 
 connectDB();
 app.listen(PORT, () => console.log(`Server started on port:http://localhost:${PORT}`));

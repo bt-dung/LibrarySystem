@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/librarydb', {
+        await mongoose.connect('mongodb+srv://buitiendung687:librarydb@library.8xfu7.mongodb.net/?retryWrites=true&w=majority&appName=Library', {
             useUnifiedTopology: true,
         });
         console.log('MongoDB connected');

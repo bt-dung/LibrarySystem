@@ -5,11 +5,11 @@ const Book = require('./Books')
 const borrowSchema = mongoose.Schema({
 
 
-    users: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    books: {
+    book: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Books'
     },

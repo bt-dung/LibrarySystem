@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('./User')
 
 const genreCountSchema = new mongoose.Schema({
-    users: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },

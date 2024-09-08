@@ -15,19 +15,16 @@ function BooksCollection() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    get('http://localhost:5000/book/allBook?genre=sachtonghop')
+    fetch('http://localhost:5000/book/allBook?genre=sachtonghop')
       .then(response => response.json())
       .then(data => setBooks(data.data || []))
       .catch(error => console.error('Error fetching books:', error));
   }, []);
 
-  // Pagination
   const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
   const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
   const totalPages = Math.ceil(books.length / BOOKS_PER_PAGE);
-
-  // Hàm xử lý nút Đăng ký
   const handleRegister = (bookId) => {
     fetch(`http://localhost:5000/book/${bookId}`, {
       method: 'PATCH',
