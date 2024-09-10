@@ -31,7 +31,7 @@ function Header() {
   };
 
   const handleSignup = () => {
-    navigate('/signup');
+    navigate('/register');
   };
 
   return (

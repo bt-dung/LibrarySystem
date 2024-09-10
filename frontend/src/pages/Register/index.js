@@ -11,19 +11,23 @@ const cx = classNames.bind(styles);
 
 function Register() {
   const navigate = useNavigate();
-
   const onFinish = async (values) => {
     try {
       const response = await axios.post('http://localhost:5000/auth/register', values);
-
       if (response.data.success) {
         message.success("Đăng ký thành công!");
-        navigate("/login");
+        navigate("/login", {
+          state: { email: values.email, password: values.password }
+        });
       } else {
         message.error(response.data.message || "Đăng ký không thành công!");
       }
     } catch (error) {
-      message.error("Lỗi khi đăng ký.");
+      if (error.response && error.response.data) {
+        message.error(error.response.data.message || "Lỗi khi đăng ký.");
+      } else {
+        message.error("Lỗi không xác định khi đăng ký.");
+      }
       console.error('Lỗi API:', error);
     }
   };
@@ -41,11 +45,11 @@ function Register() {
       </div>
       <Card className={cx('signup-card')} title="Đăng ký tài khoản">
         <Form onFinish={onFinish} layout="vertical">
-          <Form.Item label="Tên sinh viên" name="studentName" rules={rules}>
+          <Form.Item label="Tên sinh viên" name="username" rules={rules}>
             <Input />
           </Form.Item>
 
-          <Form.Item label="Mã sinh viên" name="studentId" rules={rules}>
+          <Form.Item label="Mã sinh viên" name="msv" rules={rules}>
             <Input />
           </Form.Item>
 

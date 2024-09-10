@@ -16,6 +16,7 @@ app.use(cors({
     credentials: true,
 }));
 dotenv.config();
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 

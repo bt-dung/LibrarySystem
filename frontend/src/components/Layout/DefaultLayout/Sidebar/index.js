@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getCookie } from '~/components/cookies/cookieHelper';
 import { Link } from 'react-router-dom';
@@ -8,6 +9,7 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 const Sidebar = () => {
+  const { id } = useParams();
   const [topReadBooks, setTopReadBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const booksPerPage = 2;
@@ -17,10 +19,11 @@ const Sidebar = () => {
     const token = getCookie('token');
     setShowSidebar(!!token);
 
-    if (token) {
+    if (token && id) {
       const fetchTopReadBooks = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/book/recommend');
+          const response = await axios.get(`http://localhost:5000/book/recommend/${id}`);
+          console.log(response);
           setTopReadBooks(response.data.data);
         } catch (error) {
           console.error('Lỗi khi lấy dữ liệu sách:', error);
@@ -29,7 +32,7 @@ const Sidebar = () => {
 
       fetchTopReadBooks();
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {

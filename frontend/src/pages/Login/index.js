@@ -1,26 +1,36 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { Button, Card, Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import classNames from 'classnames/bind';
 import styles from './Login.module.scss';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import images from '~/assets/images';
 
 const cx = classNames.bind(styles);
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [form] = Form.useForm();
 
+  useEffect(() => {
+    if (location.state) {
+      form.setFieldsValue({
+        email: location.state.email || '',
+        password: location.state.password || ''
+      });
+    }
+  }, [location.state, form]);
   const onFinish = async (values) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', values);
-
+      const response = await axios.post('http://localhost:5000/auth/login', values, {
+        withCredentials: true
+      });
       if (response.data.success) {
         message.success("Đăng nhập thành công!");
-        const token = response.data.token;
-        Cookies.set('token', token);
         navigate("/");
       } else {
         message.error(response.data.message || "Tài khoản hoặc mật khẩu không chính xác!");
@@ -31,10 +41,6 @@ function Login() {
     }
   };
 
-  const rules = [
-    { required: true, message: 'Vui lòng nhập vào trường này!' }
-  ];
-
   return (
     <div className={cx('login-container')}>
       <div className={cx('logo-tlu')}>
@@ -43,12 +49,15 @@ function Login() {
         </Link>
       </div>
       <Card className={cx('login-card')} title="Đăng nhập">
-        <Form onFinish={onFinish} layout="vertical">
-          <Form.Item label="Email" name="email" rules={rules}>
+        <Form form={form} name="login" onFinish={onFinish} initialValues={{
+          email: location.state?.email || '',
+          password: location.state?.password || ''
+        }} layout="vertical">
+          <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập email!' }]}>
             <Input />
           </Form.Item>
 
-          <Form.Item label="Mật khẩu" name="password" rules={rules}>
+          <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
             <Input.Password />
           </Form.Item>
           <Form.Item>

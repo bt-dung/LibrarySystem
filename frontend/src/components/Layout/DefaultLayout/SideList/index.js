@@ -11,7 +11,7 @@ function SideList() {
 
   useEffect(() => {
     // Lấy dữ liệu từ API để lấy danh sách thể loại
-    fetch('http://localhost:3002/data') // Lấy danh sách sách để lấy các thể loại
+    fetch('http://localhost:5000/book/allBook') // Lấy danh sách sách để lấy các thể loại
       .then(response => response.json())
       .then(data => {
         const uniqueCategories = [...new Set(data.data.map(book => book.subcategory))];
@@ -27,7 +27,7 @@ function SideList() {
         {categories.map((category, index) => (
           <li key={index}>
             <Link to={`/result?query=${encodeURIComponent(category)}`}>
-             <Button rounded  >{category}</Button>
+              <Button rounded  >{category}</Button>
             </Link>
           </li>
         ))}

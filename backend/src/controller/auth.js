@@ -1,11 +1,16 @@
 const User = require('../models/User')
-const bcrypt = require('bcryptjs');
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken')
 const { asyncHandler } = require('../middlewares/asyncHandler')
-
-
+const maxAge = 3 * 24 * 60 * 60
+const createToken = (id) => {
+    console.log('JWT Secret:', process.env.JWT_SECRET);
+    return jwt.sign({ id }, 'DungLapLanh', {
+        expiresIn: maxAge
+    })
+}
 const registerUser = asyncHandler(async (req, res) => {
     const { username, msv, email, password } = req.body;
+
     if (!username || !msv || !email || !password) {
         throw new Error("Please fill all the inputs.");
     }
@@ -13,46 +18,33 @@ const registerUser = asyncHandler(async (req, res) => {
     const userExists = await User.findOne({ msv });
     if (userExists) { return res.status(400).send({ message: "User already exists", success: false }) };
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ studentName: username, msv: msv, email: email, password: hashedPassword });
+    const newUser = new User({ studentName: username, msv: msv, email: email, password: password });
 
     try {
         await newUser.save();
-        res.send({ message: "Create account success!!", success: true });
+        const token = createToken(newUser._id)
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+        return res.status(201).json({ message: "Create account success", newUser: newUser._id, success: true });
     } catch (error) {
-        res.status(400).send({ message: "Invalid user data", success: false });
+        console.error("Error saving user:", error);
+        return res.status(400).send({ message: "Invalid user data", success: false });
     }
 });
-
 const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
     try {
-        const { email, password } = req.body;
-        let existingUser = await userModel.findOne({ email });
+        const user = await User.login(email, password)
+        const token = createToken(user._id)
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
 
-        if (!existingUser) return res.status(500).send("wrong!!");
-
-        bcrypt.compare(password, existingUser.password, function (err, result) {
-            if (result) res.status(200).send("u can login")
-            else res.redirect("/login")
-        })
-        if (validEmail && match) {
-            const token = jwt.sign(
-                { id: validEmail.id, role: validEmail.role, name: validEmail.username },
-                process.env.KEY_TOKEN,
-                { expiresIn: "2h" }
-            );
-            res.cookie("token", token)
-            return res.send({
-                message: "đăng nhập thành công",
-                success: true,
-                token,
-            });
-        }
+        console.log('Set-Cookie Header:', res.getHeader('Set-Cookie'));
+        return res.status(200).json({
+            message: "Đăng nhập thành công",
+            success: true,
+            user: user._id
+        });
     } catch (error) {
-        console.log(error);
-        return res.send({ message: "something is wrong", success: false });
-
+        return res.status(400).json({ message: "Đăng nhập thất bại", success: false, error });
     }
 
 });
