@@ -5,13 +5,16 @@ import { Button } from 'antd';
 import Pagination from '~/components/Pagination';
 import { Link } from 'react-router-dom';
 
+import { useNavigate } from 'react-router-dom';
+import { getCookie } from '~/components/cookies/cookieHelper';
 const cx = classNames.bind(styles);
 
-const BOOKS_PER_PAGE = 20;
+const BOOKS_PER_PAGE = 12;
 
 function Home() {
   const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch('http://localhost:5000/book/allBook')
@@ -29,11 +32,25 @@ function Home() {
   const totalPages = Math.ceil(books.length / BOOKS_PER_PAGE);
 
   const handleRegister = (bookId) => {
-    fetch(`http://localhost:5000/book/${bookId}`, {
+    console.log("BookID đăng ký:", bookId)
+
+    const token = getCookie('jwt');
+    if (!token) {
+      alert('Bạn cần đăng nhập để mượn sách.');
+      navigate('/login')
+      return
+    }
+    fetch(`http://localhost:5000/api/borrow`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
+      body: JSON.stringify({
+        bookId: bookId,
+        borrowDate: new Date().toISOString(),
+        returnDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString()
+      })
     })
       .then(response => {
         if (!response.ok) {
@@ -45,7 +62,7 @@ function Home() {
         alert('Đăng ký thành công!');
         fetch('http://localhost:5000/book/allBook?genre')
           .then(response => response.json())
-          .then(data => setBooks(data.data || []))
+          .then(data => setBooks(data || []))
           .catch(error => console.error('Error fetching updated books:', error));
       })
       .catch(error => {
@@ -60,9 +77,8 @@ function Home() {
       <div className={cx('book-list')}>
         {currentBooks.length > 0 ? (
           currentBooks.map((book) => {
-            console.log(book.cover_url)
             return (
-              <div className={cx('book-item')} key={book.id}>
+              <div className={cx('book-item')} key={book._id}>
                 {book ? (
                   <div>
                     <img
@@ -71,7 +87,7 @@ function Home() {
                       src={book.cover_url}
                       alt={book.title}
                     />
-                    <Link to={`/book/${book.id}`} className={cx('book-wrapper')}>
+                    <Link to={`/book/${book._id}`} className={cx('book-wrapper')}>
                       <img
                         style={{ width: 100, height: 100 }}
                         className={cx('book-cover')}
@@ -89,7 +105,7 @@ function Home() {
                   </div>
                 )}
                 <div className={cx('button-book')}>
-                  <Button outline onClick={() => handleRegister(book.id)}>Đăng ký</Button>
+                  <Button outline onClick={() => handleRegister(book._id)}>Đăng ký</Button>
                 </div>
               </div>
             )

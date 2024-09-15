@@ -4,22 +4,24 @@ const Book = require('./Books')
 
 const borrowSchema = mongoose.Schema({
 
-
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     book: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Books'
+        ref: 'Books',
+        required: true
     },
     borrowDate: {
         type: Date,
-        default: new Date('2024-01-01')
+        default: Date.now
     },
     returnDate: {
         type: Date,
-        default: new Date('2024-01-10')
+        default: new Date('2024-01-10'),
+        required: true
     },
     status: {
         type: String,

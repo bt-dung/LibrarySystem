@@ -2,18 +2,21 @@ const express = require('express')
 const connectDB = require('./database/db');
 const dotenv = require('dotenv');
 const app = express();
+const recommendRoute = require('./routes/recommend.route')
 const borrowRoute = require('./routes/borrow.route')
 const authRoute = require('./routes/auth.route')
 const bookRoute = require('./routes/book.route')
 const saveBooks = require('./data/books')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
+const requireAuth = require('./middlewares/authMiddleware')
 
 
 app.use(cors({
     origin: "http://localhost:3000",
-    methods: ["POST,GET,PUT,DELETE"],
+    methods: ["POST,GET,PUT,DELETE,PATCH"],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 dotenv.config();
 console.log('JWT_SECRET:', process.env.JWT_SECRET);
@@ -30,6 +33,7 @@ app.use(express.static("public"))
 app.use("/book", bookRoute);
 app.use("/auth", authRoute);
 app.use('/api', borrowRoute);
+app.use('/api', recommendRoute);
 
 connectDB();
 app.listen(PORT, () => console.log(`Server started on port:http://localhost:${PORT}`));

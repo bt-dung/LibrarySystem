@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
-import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getCookie } from '~/components/cookies/cookieHelper';
 import { Link } from 'react-router-dom';
@@ -9,57 +8,69 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 const Sidebar = () => {
-  const { id } = useParams();
   const [topReadBooks, setTopReadBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const booksPerPage = 2;
   const [showSidebar, setShowSidebar] = useState(false);
+  const slideInterval = useRef(null);
 
   useEffect(() => {
-    const token = getCookie('token');
-    setShowSidebar(!!token);
-
-    if (token && id) {
-      const fetchTopReadBooks = async () => {
+    const fetchData = async () => {
+      const token = getCookie('jwt');
+      if (token) {
+        setShowSidebar(true);
         try {
-          const response = await axios.get(`http://localhost:5000/book/recommend/${id}`);
-          console.log(response);
-          setTopReadBooks(response.data.data);
+          const response = await axios.get('http://localhost:5000/api/recommend', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setTopReadBooks(response.data.data || []);
         } catch (error) {
-          console.error('Lỗi khi lấy dữ liệu sách:', error);
+          console.error('Error fetching data:', error);
         }
-      };
+      } else {
+        setShowSidebar(false);
+      }
+    };
 
-      fetchTopReadBooks();
-    }
-  }, [id]);
-
+    fetchData();
+  }, []);
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    startAutoSlide();
+
+    return () => {
+      clearInterval(slideInterval.current);
+    };
+  }, [topReadBooks]);
+
+
+  const startAutoSlide = () => {
+    if (slideInterval.current) clearInterval(slideInterval.current); // Clear nếu interval đang chạy
+    slideInterval.current = setInterval(() => {
       setCurrentPage(prevPage => {
         const totalPages = Math.ceil(topReadBooks.length / booksPerPage);
         return prevPage === totalPages ? 1 : prevPage + 1;
       });
-    }, 6000);
+    }, 2000);
+  };
 
-    return () => clearInterval(intervalId);
-  }, [topReadBooks, booksPerPage]);
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    startAutoSlide();
+  };
   if (!showSidebar) {
     return null;
   }
 
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
-  const currentBooks = topReadBooks.slice(indexOfFirstBook, indexOfLastBook);
+  const currentBooks = Array.isArray(topReadBooks) ? topReadBooks.slice(indexOfFirstBook, indexOfLastBook) : [];
   const totalPages = Math.ceil(topReadBooks.length / booksPerPage);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   const getPaginationItems = () => {
-    return [...Array(totalPages)].map((_, index) => {
+    return Array.from({ length: totalPages }, (_, index) => {
       return (
         <div
           key={index}
@@ -79,8 +90,10 @@ const Sidebar = () => {
       <h3 className={cx('title')}>Sách gợi ý cho bạn:</h3>
       <div className={cx('book-list')}>
         {currentBooks.map(book => (
-          <Link to={`/book/${book.id}`} key={book.id} className={cx('book-item')}>
-            <img src={book.cover_url} alt={book.title} className={cx('book-cover')} />
+          <Link to={`/book/${book.id}`} key={book._id} className={cx('book-item')}>
+            <img src={book.cover_url} alt={book.title} className={cx('book-cover')
+            } onMouseEnter={() => clearInterval(slideInterval.current)} // Tạm dừng khi hover
+              onMouseLeave={startAutoSlide} />
             <div className={cx('book-details')}>
               <p className={cx('book-title')}>{book.title}</p>
               <p className={cx('book-author')}>{book.author}</p>

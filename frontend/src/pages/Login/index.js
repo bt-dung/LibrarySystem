@@ -2,7 +2,6 @@ import React from 'react';
 import { useEffect } from 'react';
 import { Button, Card, Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie';
 import axios from 'axios';
 import classNames from 'classnames/bind';
 import styles from './Login.module.scss';
@@ -13,17 +12,6 @@ const cx = classNames.bind(styles);
 
 function Login() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [form] = Form.useForm();
-
-  useEffect(() => {
-    if (location.state) {
-      form.setFieldsValue({
-        email: location.state.email || '',
-        password: location.state.password || ''
-      });
-    }
-  }, [location.state, form]);
   const onFinish = async (values) => {
     try {
       const response = await axios.post('http://localhost:5000/auth/login', values, {
@@ -49,10 +37,8 @@ function Login() {
         </Link>
       </div>
       <Card className={cx('login-card')} title="Đăng nhập">
-        <Form form={form} name="login" onFinish={onFinish} initialValues={{
-          email: location.state?.email || '',
-          password: location.state?.password || ''
-        }} layout="vertical">
+        <Form name="login" onFinish={onFinish}
+          layout="vertical">
           <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập email!' }]}>
             <Input />
           </Form.Item>

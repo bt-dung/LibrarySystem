@@ -1,12 +1,18 @@
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const { asyncHandler } = require('../middlewares/asyncHandler')
-const maxAge = 3 * 24 * 60 * 60
+const cookie = require('cookie')
+const maxAge = 60 * 60
 const createToken = (id) => {
-    console.log('JWT Secret:', process.env.JWT_SECRET);
-    return jwt.sign({ id }, 'DungLapLanh', {
-        expiresIn: maxAge
+    return jwt.sign({ userID: id }, 'DungLapLanh', {
+        expiresIn: '1h'
     })
+}
+const parse = (jwt) => {
+    const setCookie = jwt
+    const cookies = cookie.parse(setCookie)
+    const jwtToken = cookies.jwt
+    return jwtToken
 }
 const registerUser = asyncHandler(async (req, res) => {
     const { username, msv, email, password } = req.body;
@@ -22,8 +28,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
     try {
         await newUser.save();
-        const token = createToken(newUser._id)
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
         return res.status(201).json({ message: "Create account success", newUser: newUser._id, success: true });
     } catch (error) {
         console.error("Error saving user:", error);
@@ -35,22 +39,21 @@ const loginUser = asyncHandler(async (req, res) => {
     try {
         const user = await User.login(email, password)
         const token = createToken(user._id)
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-
-        console.log('Set-Cookie Header:', res.getHeader('Set-Cookie'));
+        res.cookie('jwt', token, { httpOnly: false, path: "/" })
+        console.log('Set-Cookie Header:', parse(res.getHeader('Set-Cookie')));
         return res.status(200).json({
             message: "Đăng nhập thành công",
             success: true,
-            user: user._id
+            user: user._id.toString(),
+            token
         });
     } catch (error) {
         return res.status(400).json({ message: "Đăng nhập thất bại", success: false, error });
     }
-
 });
-const logoutUser = (req, res) => {
-    res.clearCookie("token")
-    res.send({ success: true })
+const logoutUser = async (req, res) => {
+    res.clearCookie('jwt', { path: '/' });
+    res.status(200).json({ message: 'Đăng xuất thành công!' });
 }
 
 module.exports = { registerUser, loginUser, logoutUser }

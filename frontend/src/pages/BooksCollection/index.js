@@ -56,9 +56,9 @@ function BooksCollection() {
       <div className={cx('book-list')}>
         {currentBooks.length > 0 ? (
           currentBooks.map((book) => (
-            <div className={cx('book-item')} key={book.id}>
-              {book.id ? (
-                <Link to={`/book/${book.id}`} className={cx('book-wrapper')}>
+            <div className={cx('book-item')} key={book._id}>
+              {book._id ? (
+                <Link to={`/book/${book._id}`} className={cx('book-wrapper')}>
                   <img
                     className={cx('book-cover')}
                     src={book.cover_url}
@@ -75,7 +75,7 @@ function BooksCollection() {
                 </div>
               )}
               <div className={cx('button-book')}>
-                <Button outline onClick={() => handleRegister(book.id)}>Đăng ký</Button>
+                <Button outline onClick={() => handleRegister(book._id)}>Đăng ký</Button>
               </div>
             </div>
           ))

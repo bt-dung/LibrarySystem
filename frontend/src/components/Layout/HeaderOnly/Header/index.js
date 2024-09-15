@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import classNames from 'classnames/bind';
 import { Link, useNavigate } from 'react-router-dom';
-import styles from './Header.module.scss';
-import images from '~/assets/images';
+import { getCookie } from '~/components/cookies/cookieHelper';
 import Button from '~/components/Button';
 import Search from '../Search';
-import { getCookie, setCookie, deleteCookie } from '~/components/cookies/cookieHelper';
+import styles from './Header.module.scss';
+import images from '~/assets/images';
+import classNames from 'classnames/bind';
 
 const cx = classNames.bind(styles);
 
@@ -14,32 +14,37 @@ function Header() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Kiểm tra trạng thái đăng nhập từ cookie khi component được mount
-        const token = getCookie('token');
-        setCurrentUser(!!token); // Cập nhật trạng thái dựa trên sự tồn tại của cookie
+
+        const token = getCookie('jwt');
+        console.log(token);
+        setCurrentUser(token);
     }, []);
 
     const handleLogin = () => {
-        setCookie('token', 'dummyToken', 1); // Lưu cookie với thời gian hết hạn
-        setCurrentUser(true);
-        navigate('/'); // Điều hướng về trang chủ
+        navigate('/login');
     };
 
-    const handleLogout = () => {
-        fetch('http://localhost:5000/logout', {
-            method: 'POST',
-            credentials: 'include',
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Đăng xuất ok!!!');
-                    window.location.href('/login')
-                }
-            })
-            .catch(console.error('LỖi không thể xuất'));
+    const handleSignup = () => {
+        navigate('/register');
     };
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+            const data = await response.json();
+            console.log('Server response:', data);
+            if (!response.ok) {
+                throw new Error('Đăng xuất không thành công!');
+            }
+            setCurrentUser(null);
+            navigate('/');
 
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    };
     return (
         <header className={cx('wrapper')}>
             <div className={cx('inner')}>
@@ -49,7 +54,6 @@ function Header() {
                     </Link>
                 </div>
                 <div className={cx('actions')}>
-                    <Button rounded to='/Truyentranh'>Truyện tranh</Button>
                     <Button rounded to='/Sachtonghop'>Sách tổng hợp</Button>
                     <Button rounded to='/tailieuthamkhao'>Tài liệu tham khảo</Button>
                 </div>
@@ -62,11 +66,15 @@ function Header() {
                     </div>
                 ) : (
                     <div className={cx('login')}>
+                        <Button primary onClick={handleLogin}>Đăng nhập</Button>
+                        <Button primary onClick={handleSignup}>Đăng ký</Button>
                     </div>
                 )}
             </div>
         </header>
     );
-}
+};
+
+
 
 export default Header;
