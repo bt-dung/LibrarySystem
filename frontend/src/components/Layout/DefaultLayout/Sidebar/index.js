@@ -20,7 +20,7 @@ const Sidebar = () => {
       if (token) {
         setShowSidebar(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/recommend', {
+          const response = await axios.get('http://localhost:5000/api/v1/recommend', {
             headers: {
               'Authorization': `Bearer ${token}`
             }

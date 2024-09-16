@@ -13,7 +13,7 @@ function Register() {
   const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/register', values);
+      const response = await axios.post('http://localhost:5000/api/v1/register', values);
       if (response.data.success) {
         message.success("Đăng ký thành công!");
         navigate("/login", {

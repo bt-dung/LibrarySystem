@@ -17,7 +17,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/book/allBook')
+    fetch('http://localhost:5000/api/v1/allBook')
       .then(response => response.json())
       .then(data => {
         console.log(data);
@@ -40,7 +40,7 @@ function Home() {
       navigate('/login')
       return
     }
-    fetch(`http://localhost:5000/api/borrow`, {
+    fetch(`http://localhost:5000/api/v1/borrow`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ function Home() {
       })
       .then(data => {
         alert('Đăng ký thành công!');
-        fetch('http://localhost:5000/book/allBook?genre')
+        fetch('http://localhost:5000/api/v1/allBook?genre')
           .then(response => response.json())
           .then(data => setBooks(data || []))
           .catch(error => console.error('Error fetching updated books:', error));

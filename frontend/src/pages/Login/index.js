@@ -14,7 +14,7 @@ function Login() {
   const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', values, {
+      const response = await axios.post('http://localhost:5000/api/v1/login', values, {
         withCredentials: true
       });
       if (response.data.success) {

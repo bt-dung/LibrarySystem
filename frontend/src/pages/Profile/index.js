@@ -14,7 +14,7 @@ function Profile() {
 
   useEffect(() => {
     // Gọi API để lấy thông tin sách
-    axios.get(`http://localhost:5000/book/:id=${id}`)
+    axios.get(`http://localhost:5000/api/v1/:id=${id}`)
       .then(response => {
         const bookData = response.data.data[0];
         setBook(bookData);
@@ -26,7 +26,7 @@ function Profile() {
 
   // Hàm xử lý nút Đăng ký
   const handleRegister = (bookId) => {
-    fetch(`http://localhost:5000/book/${bookId}`, {
+    fetch(`http://localhost:5000/api/v1/${bookId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

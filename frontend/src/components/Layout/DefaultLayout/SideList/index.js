@@ -10,7 +10,7 @@ function SideList() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/book/allBook') // Lấy danh sách sách để lấy các thể loại
+    fetch('http://localhost:5000/api/v1/allBook') // Lấy danh sách sách để lấy các thể loại
       .then(response => response.json())
       .then(data => {
         console.log(data)

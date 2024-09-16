@@ -15,7 +15,7 @@ function BooksCollection() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetch('http://localhost:5000/book/allBook?genre=sachtonghop')
+    fetch('http://localhost:5000/api/v1/allBook?genre=sachtonghop')
       .then(response => response.json())
       .then(data => setBooks(data.data || []))
       .catch(error => console.error('Error fetching books:', error));
@@ -26,7 +26,7 @@ function BooksCollection() {
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
   const totalPages = Math.ceil(books.length / BOOKS_PER_PAGE);
   const handleRegister = (bookId) => {
-    fetch(`http://localhost:5000/book/${bookId}`, {
+    fetch(`http://localhost:5000/api/v1/${bookId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ function BooksCollection() {
       })
       .then(data => {
         alert('Đăng ký thành công!');
-        fetch('http://localhost:5000/book/allBook?genre=sachtonghop')
+        fetch('http://localhost:5000/api/v1/allBook?genre=sachtonghop')
           .then(response => response.json())
           .then(data => setBooks(data.data || []))
           .catch(error => console.error('Error fetching updated books:', error));

@@ -29,7 +29,7 @@ function Header() {
   };
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:5000/auth/logout', {
+      const response = await fetch('http://localhost:5000/api/v1/logout', {
         method: 'POST',
         credentials: 'include',
       });

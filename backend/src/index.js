@@ -30,10 +30,10 @@ app.use(express.static("public"))
 
 
 // saveBooks();
-app.use("/book", bookRoute);
-app.use("/auth", authRoute);
-app.use('/api', borrowRoute);
-app.use('/api', recommendRoute);
+app.use("/api/v1", bookRoute);
+app.use("/api/v1", authRoute);
+app.use('/api/v1', borrowRoute);
+app.use('/api/v1', recommendRoute);
 
 connectDB();
 app.listen(PORT, () => console.log(`Server started on port:http://localhost:${PORT}`));
